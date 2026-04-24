@@ -98,6 +98,14 @@ document.addEventListener('mousemove', e => {
   if (rawVel > 4) flares.push({ life: 1.0, intensity: Math.min(rawVel/60, 1) });
 });
 
+document.addEventListener('touchmove', e => {
+  const touch = e.touches[0];
+  const dx = touch.clientX - lastMX, dy = touch.clientY - lastMY;
+  rawVel = Math.sqrt(dx*dx + dy*dy);
+  lastMX = touch.clientX; lastMY = touch.clientY;
+  if (rawVel > 4) flares.push({ life: 1.0, intensity: Math.min(rawVel/60, 1) });
+}, { passive: true });
+
 const oc = document.getElementById('orbit-canvas'), octx = oc.getContext('2d');
 const OW = oc.width, OH = oc.height, ocx = OW/2, ocy = OH/2;
 const gold = '#c8a96e', goldDim = 'rgba(200,169,110,';
