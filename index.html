@@ -204,7 +204,7 @@ function drawBig(t) {
   bctx.setLineDash([2,22]); bctx.strokeStyle='rgba(200,169,110,0.13)'; bctx.lineWidth=0.7; bctx.stroke();
   bctx.setLineDash([]);
 
-  const dp = project(-t*0.36, a, b);
+const dp = project(t*0.36, a, b);
   const depthNorm = (dp.z/a+1)/2;
   const dotAlpha = 0.35+depthNorm*0.55, dotSize = 1.8+depthNorm*1.6;
 
