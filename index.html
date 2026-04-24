@@ -193,7 +193,7 @@ function spawnFlare(px, py, intensity) {
 
 function drawBig(t) {
   bctx.clearRect(0, 0, BW, BH);
-  const a = Math.min(BW,BH)*0.50, b = Math.min(BW,BH)*0.17;
+ const a = Math.min(BW,BH)*0.17, b = Math.min(BW,BH)*0.50;
 
   bctx.beginPath();
   for (let i = 0; i <= 180; i++) {
