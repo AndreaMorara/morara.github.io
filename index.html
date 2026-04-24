@@ -1,200 +1,248 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MORARA.COM.AU - Coming Soon</title>
-  <!-- Inclusione del font Montserrat da Google Fonts -->
-  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet">
-  <style>
-    /* Reset base */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    body {
-      font-family: 'Montserrat', sans-serif;
-      background: #141e30;
-      color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      text-align: center;
-      padding: 20px;
-      position: relative; /* Necessario per il layering */
-      z-index: 2;
-    }
-    .container {
-      opacity: 0;
-      animation: fadeIn 1.5s ease-in-out forwards;
-      position: relative;
-      z-index: 3;
-    }
-    @keyframes fadeIn {
-      to { opacity: 1; }
-    }
-    /* Header */
-    h1 {
-      font-size: 3em;
-      margin-bottom: 10px;
-      text-transform: uppercase;
-    }
-    h2 {
-      font-size: 2em;
-      margin-bottom: 30px;
-      text-transform: uppercase;
-    }
-    /* Quadrante dell'orologio con background animato */
-    .clock {
-      position: relative;
-      width: 200px;
-      height: 200px;
-      border-radius: 50%;
-      margin: 0 auto;
-      background: linear-gradient(45deg, #ff4081, #00bcd4, #8e24aa, #ff4081);
-      background-size: 400% 400%;
-      animation: gradientAnimation 15s ease infinite;
-    }
-    @keyframes gradientAnimation {
-      0%   { background-position: 0% 50%; }
-      50%  { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-    /* Lancetta dei secondi */
-    .hand.second {
-      position: absolute;
-      bottom: 50%;
-      left: 50%;
-      width: 2px;
-      height: 90px;
-      background: #fff;
-      border-radius: 1px;
-      transform-origin: bottom;
-      animation: rotate-second 60s linear infinite;
-    }
-    @keyframes rotate-second {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-    .center {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 12px;
-      height: 12px;
-      background: #fff;
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-    }
-    /* Contenitore per la scia del pallino */
-    .dot-orbit {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
-    }
-    /* Ogni orbit-container ruota lungo una traiettoria circolare */
-    .orbit-container {
-      position: absolute;
-      width: 0;
-      height: 0;
-      /* L'animazione parte da -90deg (ore 12) e arriva a -450deg, cioè una rivoluzione completa */
-      animation: orbit 10s ease-in-out infinite;
-      animation-fill-mode: backwards;
-    }
-    @keyframes orbit {
-      from { transform: rotate(-90deg); }
-      to   { transform: rotate(-450deg); }
-    }
-    /* Il pallino: il cui centro sarà sempre a 115px dal centro dell'orologio.
-       (115px = 100px [raggio] + 10px [gap] + 5px [metà del pallino]) */
-    .moving-dot {
-      position: absolute;
-      top: 0;
-      left: 115px;
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background-color: #ff4081; /* colore iniziale impostato via JS */
-      transform: translate(-50%, -50%);
-    }
-    /* Creiamo 10 copie per ottenere una scia continua */
-    .orbit-container:nth-child(1)  { animation-delay: 0s;   opacity: 1; }
-    .orbit-container:nth-child(2)  { animation-delay: 0.1s; opacity: 0.9; }
-    .orbit-container:nth-child(3)  { animation-delay: 0.2s; opacity: 0.8; }
-    .orbit-container:nth-child(4)  { animation-delay: 0.3s; opacity: 0.7; }
-    .orbit-container:nth-child(5)  { animation-delay: 0.4s; opacity: 0.6; }
-    .orbit-container:nth-child(6)  { animation-delay: 0.5s; opacity: 0.5; }
-    .orbit-container:nth-child(7)  { animation-delay: 0.6s; opacity: 0.4; }
-    .orbit-container:nth-child(8)  { animation-delay: 0.7s; opacity: 0.3; }
-    .orbit-container:nth-child(9)  { animation-delay: 0.8s; opacity: 0.2; }
-    .orbit-container:nth-child(10) { animation-delay: 0.9s; opacity: 0.1; }
-    
-    /* Responsive: per schermi piccoli (es. orologio di 150px di diametro, raggio = 75px)
-       In questo caso, la distanza diventa 75 + 10 + 5 = 90px */
-    @media (max-width: 600px) {
-      h1 { font-size: 2.5em; }
-      h2 { font-size: 1.5em; }
-      .clock { width: 150px; height: 150px; }
-      .hand.second { height: 70px; }
-      .moving-dot { left: 90px; }
-    }
-    /* Overlay circuito stampato stilizzato */
-    .circuit-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: url('https://www.toptal.com/designers/subtlepatterns/patterns/circuit-board.png') repeat;
-      background-size: cover;
-      pointer-events: none;
-      z-index: 1;
-      /* L'overlay parte con opacità zero, raggiunge il 75% e poi svanisce */
-      animation: fadeCircuit 20s ease-in-out infinite, moveCircuit 20s linear infinite;
-    }
-    @keyframes fadeCircuit {
-      0%   { opacity: 0; }
-      25%  { opacity: 0.75; }
-      75%  { opacity: 0.75; }
-      100% { opacity: 0; }
-    }
-    @keyframes moveCircuit {
-      0%   { transform: translate(0, 0); }
-      50%  { transform: translate(20px, 20px); }
-      100% { transform: translate(0, 0); }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MORARA.COM.AU — Coming Soon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Archivo:wght@100;200;300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #050810;
+    --gold: #c8a96e;
+    --text: #e8e4dc;
+    --muted: rgba(232, 228, 220, 0.4);
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    overflow: hidden;
+    font-family: 'Archivo', sans-serif;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0; opacity: 0.5;
+  }
+
+  #bg-canvas {
+    position: fixed; inset: 0;
+    width: 100%; height: 100%;
+    z-index: 1; pointer-events: none;
+  }
+
+  .wrapper {
+    position: relative; z-index: 2;
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+  }
+
+  .domain {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: clamp(2.2rem, 5.5vw, 4.2rem);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text); line-height: 1;
+    animation: fadeDown 1.4s cubic-bezier(0.16,1,0.3,1) forwards;
+    opacity: 0;
+  }
+  .domain .tld { color: var(--gold); }
+
+  #orbit-canvas {
+    display: block; margin: 2.6rem 0;
+    animation: fadeIn 1.4s 0.4s cubic-bezier(0.16,1,0.3,1) forwards;
+    opacity: 0;
+  }
+
+  .coming-soon {
+    font-weight: 100;
+    font-size: clamp(0.55rem, 1.4vw, 0.75rem);
+    letter-spacing: 0.55em; text-transform: uppercase;
+    color: var(--muted);
+    animation: fadeUp 1.4s 0.8s cubic-bezier(0.16,1,0.3,1) forwards;
+    opacity: 0;
+  }
+
+  @keyframes fadeDown { from{opacity:0;transform:translateY(-18px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeUp   { from{opacity:0;transform:translateY(18px)}  to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeIn   { from{opacity:0} to{opacity:1} }
+</style>
 </head>
 <body>
-  <div class="container">
-    <!-- Header -->
-    <h1>MORARA.COM.AU</h1>
-    <h2>COMING SOON</h2>
-    <!-- Quadrante dell'orologio -->
-    <div class="clock">
-      <div class="hand second"></div>
-      <div class="center"></div>
-      <!-- Contenitore per il pallino e la sua scia -->
-      <div class="dot-orbit">
-        <div class="orbit-container"><div class="moving-dot"></div></div>
-        <div class="orbit-container"><div class="moving-dot"></div></div>
-        <div class="orbit-container"><div class="moving-dot"></div></div>
-        <div class="orbit-container"><div class="moving-dot"></div></div>
-        <div class="orbit-container"><div class="moving-dot"></div></div>
-        <div class="orbit-container"><div class="moving-dot"></div></div>
-        <div class="orbit-container"><div class="moving-dot"></div></div>
-        <div class="orbit-container"><div class="moving-dot"></div></div>
-        <div class="orbit-container"><div class="moving-dot"></div></div>
-        <div class="orbit-container"><div class="moving-dot"></div></div>
-      </div>
-    </div>
-  </div>
-  <!-- Overlay circuito stampato stilizzato -->
-  <div class="circuit-overlay"></div>
+
+<canvas id="bg-canvas"></canvas>
+
+<div class="wrapper">
+  <div class="domain">morara<span class="tld">.com.au</span></div>
+  <canvas id="orbit-canvas" width="132" height="132"></canvas>
+  <div class="coming-soon">coming soon</div>
+</div>
+
+<script>
+let flares = [], lastMX = window.innerWidth/2, lastMY = window.innerHeight/2, rawVel = 0;
+
+document.addEventListener('mousemove', e => {
+  const dx = e.clientX - lastMX, dy = e.clientY - lastMY;
+  rawVel = Math.sqrt(dx*dx + dy*dy);
+  lastMX = e.clientX; lastMY = e.clientY;
+  if (rawVel > 4) flares.push({ life: 1.0, intensity: Math.min(rawVel/60, 1) });
+});
+
+const oc = document.getElementById('orbit-canvas'), octx = oc.getContext('2d');
+const OW = oc.width, OH = oc.height, ocx = OW/2, ocy = OH/2;
+const gold = '#c8a96e', goldDim = 'rgba(200,169,110,';
+const PARTICLES = 18, outerR = 50, innerR = 26;
+
+function drawSmall(t) {
+  octx.clearRect(0, 0, OW, OH);
+
+  octx.beginPath(); octx.arc(ocx, ocy, outerR, 0, Math.PI*2);
+  octx.strokeStyle = 'rgba(200,169,110,0.12)'; octx.lineWidth = 0.5; octx.stroke();
+
+  octx.beginPath(); octx.arc(ocx, ocy, innerR, 0, Math.PI*2);
+  octx.strokeStyle = 'rgba(200,169,110,0.07)'; octx.lineWidth = 0.5; octx.stroke();
+
+  for (let i = 0; i < PARTICLES; i++) {
+    const ang = (i/PARTICLES)*Math.PI*2 + t, rel = ((i/PARTICLES)+1)%1;
+    octx.beginPath();
+    octx.arc(ocx+Math.cos(ang)*outerR, ocy+Math.sin(ang)*outerR, rel*1.8+0.3, 0, Math.PI*2);
+    octx.fillStyle = goldDim+(Math.pow(rel,2.5)*0.7+0.05)+')'; octx.fill();
+  }
+
+  const lpx = ocx+Math.cos(t)*outerR, lpy = ocy+Math.sin(t)*outerR;
+  const g1 = octx.createRadialGradient(lpx,lpy,0,lpx,lpy,5);
+  g1.addColorStop(0,'rgba(200,169,110,0.9)'); g1.addColorStop(1,'rgba(200,169,110,0)');
+  octx.beginPath(); octx.arc(lpx,lpy,5,0,Math.PI*2); octx.fillStyle=g1; octx.fill();
+  octx.beginPath(); octx.arc(lpx,lpy,1.5,0,Math.PI*2); octx.fillStyle=gold; octx.fill();
+
+  const ia = -t*1.6+Math.PI/3, ipx = ocx+Math.cos(ia)*innerR, ipy = ocy+Math.sin(ia)*innerR;
+  const g2 = octx.createRadialGradient(ipx,ipy,0,ipx,ipy,3.5);
+  g2.addColorStop(0,'rgba(232,228,220,0.7)'); g2.addColorStop(1,'rgba(232,228,220,0)');
+  octx.beginPath(); octx.arc(ipx,ipy,3.5,0,Math.PI*2); octx.fillStyle=g2; octx.fill();
+  octx.beginPath(); octx.arc(ipx,ipy,1.2,0,Math.PI*2); octx.fillStyle='rgba(232,228,220,0.8)'; octx.fill();
+
+  for (let i = 1; i <= 8; i++) {
+    const ta = -(t*1.6-i*0.18)+Math.PI/3;
+    octx.beginPath();
+    octx.arc(ocx+Math.cos(ta)*innerR, ocy+Math.sin(ta)*innerR, 0.8, 0, Math.PI*2);
+    octx.fillStyle = `rgba(232,228,220,${(1-i/8)*0.3})`; octx.fill();
+  }
+
+  octx.beginPath(); octx.arc(ocx,ocy,2,0,Math.PI*2);
+  octx.fillStyle='rgba(200,169,110,0.5)'; octx.fill();
+  const pulse = 0.5+0.5*Math.sin(t*2.5);
+  octx.beginPath(); octx.arc(ocx,ocy,6+pulse*3,0,Math.PI*2);
+  octx.strokeStyle=`rgba(200,169,110,${0.06+pulse*0.06})`; octx.lineWidth=0.5; octx.stroke();
+}
+
+const bc = document.getElementById('bg-canvas'), bctx = bc.getContext('2d');
+let BW, BH, BCX, BCY;
+
+function resizeBg() {
+  BW = bc.width = window.innerWidth; BH = bc.height = window.innerHeight;
+  BCX = BW/2; BCY = BH/2;
+}
+resizeBg();
+window.addEventListener('resize', resizeBg);
+
+const FIXED_AX = 0.18, FIXED_AY = -0.22;
+const TRAIL_LEN = 55, trail = [];
+let flareParticles = [];
+
+function project(angle, a, b) {
+  const ex = Math.cos(angle)*a, ey = Math.sin(angle)*b;
+  const rx = ex*Math.cos(FIXED_AY), rz = -ex*Math.sin(FIXED_AY);
+  const ry = ey*Math.cos(FIXED_AX) - rz*Math.sin(FIXED_AX);
+  const depth = ey*Math.sin(FIXED_AX) + rz*Math.cos(FIXED_AX);
+  return { x: BCX+rx, y: BCY+ry, z: depth };
+}
+
+function spawnFlare(px, py, intensity) {
+  const count = Math.floor(3 + intensity*9);
+  for (let i = 0; i < count; i++) {
+    const angle = Math.random()*Math.PI*2;
+    const speed = (0.4+Math.random()*0.8)*(26+intensity*52);
+    const length = (0.3+Math.random()*0.7)*(12+intensity*36);
+    flareParticles.push({
+      x:px, y:py,
+      vx:Math.cos(angle)*speed*0.016, vy:Math.sin(angle)*speed*0.016,
+      life:1.0, decay:0.032+Math.random()*0.04,
+      length, alpha:0.36+intensity*0.23, size:0.33+intensity*0.78
+    });
+  }
+  flareParticles.push({ halo:true, x:px, y:py, life:1.0, decay:0.022, maxR:14+intensity*42, alpha:0.12+intensity*0.14 });
+}
+
+function drawBig(t) {
+  bctx.clearRect(0, 0, BW, BH);
+  const a = Math.min(BW,BH)*0.50, b = Math.min(BW,BH)*0.17;
+
+  bctx.beginPath();
+  for (let i = 0; i <= 180; i++) {
+    const p = project((i/180)*Math.PI*2, a, b);
+    i===0 ? bctx.moveTo(p.x,p.y) : bctx.lineTo(p.x,p.y);
+  }
+  bctx.closePath();
+  bctx.setLineDash([2,22]); bctx.strokeStyle='rgba(200,169,110,0.13)'; bctx.lineWidth=0.7; bctx.stroke();
+  bctx.setLineDash([]);
+
+  const dp = project(-t*0.36, a, b);
+  const depthNorm = (dp.z/a+1)/2;
+  const dotAlpha = 0.35+depthNorm*0.55, dotSize = 1.8+depthNorm*1.6;
+
+  flares.forEach(f => { if (f.life===1.0) spawnFlare(dp.x, dp.y, f.intensity); });
+  flares = flares.filter(f => { f.life-=0.5; return f.life>0; });
+
+  flareParticles = flareParticles.filter(p => p.life>0);
+  for (const p of flareParticles) {
+    const progress = 1-p.life;
+    if (p.halo) {
+      const r = p.maxR*progress, alpha = p.alpha*p.life*p.life;
+      const grd = bctx.createRadialGradient(p.x,p.y,0,p.x,p.y,r);
+      grd.addColorStop(0,'rgba(200,169,110,0)');
+      grd.addColorStop(0.5,`rgba(200,169,110,${alpha*0.6})`);
+      grd.addColorStop(0.85,`rgba(200,169,110,${alpha})`);
+      grd.addColorStop(1,'rgba(200,169,110,0)');
+      bctx.beginPath(); bctx.arc(p.x,p.y,r,0,Math.PI*2); bctx.fillStyle=grd; bctx.fill();
+    } else {
+      const cx2=p.x+p.vx*progress*60, cy2=p.y+p.vy*progress*60;
+      const alpha=p.alpha*Math.pow(p.life,1.4);
+      bctx.beginPath();
+      bctx.moveTo(cx2-p.vx*p.length*p.life, cy2-p.vy*p.length*p.life);
+      bctx.lineTo(cx2,cy2);
+      bctx.strokeStyle=`rgba(200,169,110,${alpha})`; bctx.lineWidth=p.size*p.life; bctx.lineCap='round'; bctx.stroke();
+    }
+    p.life -= p.decay;
+  }
+
+  trail.push({x:dp.x,y:dp.y});
+  if (trail.length>TRAIL_LEN) trail.shift();
+  for (let i=0; i<trail.length; i++) {
+    const prog=i/trail.length, alpha=Math.pow(prog,1.6)*dotAlpha*0.5;
+    bctx.beginPath(); bctx.arc(trail[i].x,trail[i].y,prog*dotSize*0.85+0.2,0,Math.PI*2);
+    bctx.fillStyle=`rgba(200,169,110,${alpha})`; bctx.fill();
+  }
+
+  const grd=bctx.createRadialGradient(dp.x,dp.y,0,dp.x,dp.y,18);
+  grd.addColorStop(0,`rgba(200,169,110,${dotAlpha*0.5})`); grd.addColorStop(1,'rgba(200,169,110,0)');
+  bctx.beginPath(); bctx.arc(dp.x,dp.y,18,0,Math.PI*2); bctx.fillStyle=grd; bctx.fill();
+  bctx.beginPath(); bctx.arc(dp.x,dp.y,dotSize,0,Math.PI*2);
+  bctx.fillStyle=`rgba(200,169,110,${dotAlpha})`; bctx.fill();
+}
+
+let t = 0;
+function loop() { drawBig(t); drawSmall(t); t+=0.012; requestAnimationFrame(loop); }
+loop();
+</script>
 </body>
 </html>
-
